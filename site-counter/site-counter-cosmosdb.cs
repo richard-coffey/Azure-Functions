@@ -9,7 +9,6 @@ using Microsoft.Azure.Storage.Queue;
 
 namespace SiteCounter
 {
-
     public class SiteCounter
     {
         public int Counter { get; set; }
@@ -17,7 +16,7 @@ namespace SiteCounter
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
-        public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] string siteCounterMessage, ILogger log)
+        public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
@@ -58,7 +57,7 @@ namespace SiteCounter
             // Convert site counter message to site counter object
             SiteCounter siteCounter = new SiteCounter
             {
-                Counter = int.Parse(siteCounterMessage)
+                Counter = int.Parse(siteCounterMessage.AsString)
             };
 
             // Add site counter object to CosmosDB
