@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
-using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Queue;
 
 namespace SiteCounter
@@ -15,7 +14,7 @@ namespace SiteCounter
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
-        public static async Task Run([Queue("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
+        public static void Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
@@ -35,10 +34,10 @@ namespace SiteCounter
             var cosmosDBSecretName = "DatabaseConnectionString";
 
             // Retrieve the storage queue connection string secret from the Key Vault
-            var storageQueueSecret = await keyVaultClient.GetSecretAsync(BaseUri, storageQueueSecretName);
+            var storageQueueSecret = keyVaultClient.GetSecretAsync(BaseUri, storageQueueSecretName).GetAwaiter().GetResult();
 
             // Retrieve the CosmosDB connection string secret from the Key Vault
-            var cosmosDBSecret = await keyVaultClient.GetSecretAsync(BaseUri, cosmosDBSecretName);
+            var cosmosDBSecret = keyVaultClient.GetSecretAsync(BaseUri, cosmosDBSecretName).GetAwaiter().GetResult();
 
             // Get the storage queue connection string from the secret
             var storageQueueConnectionString = storageQueueSecret.Value;
@@ -60,7 +59,7 @@ namespace SiteCounter
             };
 
             // Add site counter object to CosmosDB
-            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
+            container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString())).GetAwaiter().GetResult();
         }
     }
 }
