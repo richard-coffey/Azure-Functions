@@ -1,19 +1,17 @@
-using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Storage.Queue;
+using System.Threading.Tasks;
 
 namespace SiteCounter
 {
     public static class SiteCounterFunction
     {
         [FunctionName("SiteCounterFunction")]
-        public static async void Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] Microsoft.AspNetCore.Http.HttpRequest req, ILogger log)
+        public static async Task Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] Microsoft.AspNetCore.Http.HttpRequest req, ILogger log)
         {
             log.LogInformation("SiteCounterFunction function processed a request.");
 
@@ -24,11 +22,11 @@ namespace SiteCounter
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
             // Get the storage connection string from the Key Vault
-            var storageConnectionStringSecret = await keyVaultClient.GetSecretAsync("https://azure-serverless-cv.vault.azure.net/secrets/QueueStorageConnectionString/253316b1740d4b01a02a307101d77ef0");
+            var storageConnectionStringSecret = await keyVaultClient.GetSecretAsync("https://<your-key-vault-name>.vault.azure.net/secrets/<your-storage-connection-string-secret>");
             var storageConnectionString = storageConnectionStringSecret.Value;
 
             // Connect to Azure Storage Account
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
 
             // Get reference to queue
             var queueClient = storageAccount.CreateCloudQueueClient();
