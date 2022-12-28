@@ -3,8 +3,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Storage.Queue;
 using System.Threading.Tasks;
+using Microsoft.Azure.Storage.Queue;
 
 namespace SiteCounter
 {
@@ -21,9 +21,17 @@ namespace SiteCounter
             // Get a client for the Key Vault
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
-            // Get the storage connection string from the Key Vault
-            var storageConnectionStringSecret = await keyVaultClient.GetSecretAsync("https://azure-serverless-cv.vault.azure.net/secrets/QueueStorageConnectionString/253316b1740d4b01a02a307101d77ef0/latest?api-version=2016-10-01");
-            var storageConnectionString = storageConnectionStringSecret.Value;
+            // URI of the Key Vault
+            var BaseUri = "https://azure-serverless-cv.vault.azure.net";
+
+            // Name of the secret
+            var secretname = "QueueStorageConnectionString";
+
+            // Retrieve the secret from the Key Vault
+            var secret = await keyVaultClient.GetSecretAsync(BaseUri, secretname);
+
+            // Get the storage connection string from the secret
+            var storageConnectionString = secret.Value;
 
             // Connect to Azure Storage Account
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
@@ -33,23 +41,23 @@ namespace SiteCounter
             var queue = queueClient.GetQueueReference("site-counter");
 
             // Create queue if it doesn't already exist
-            await queue.CreateIfNotExistsAsync();
+        await queue.CreateIfNotExistsAsync();
 
-            // Get current site counter from queue
-            var siteCounter = 0;
-            var queueMessage = await queue.GetMessageAsync();
-            if (queueMessage != null)
-            {
-                // Increment site counter
-                siteCounter = int.Parse(queueMessage.AsString) + 1;
+        // Get current site counter from queue
+        var siteCounter = 0;
+        var queueMessage = await queue.GetMessageAsync();
+        if (queueMessage != null)
+        {
+            // Increment site counter
+            siteCounter = int.Parse(queueMessage.AsString) + 1;
 
-                // Delete existing queue message
-                await queue.DeleteMessageAsync(queueMessage);
-            }
-
-            // Add new site counter value to queue
-            queueMessage = new CloudQueueMessage(siteCounter.ToString());
-            await queue.AddMessageAsync(queueMessage);
+            // Delete existing queue message
+            await queue.DeleteMessageAsync(queueMessage);
         }
+
+        // Add new site counter value to queue
+        queueMessage = new CloudQueueMessage(siteCounter.ToString());
+        await queue.AddMessageAsync(queueMessage);
+    }
     }
 }
