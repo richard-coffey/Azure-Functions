@@ -22,7 +22,7 @@ namespace SiteCounter
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
             // Get the storage connection string from the Key Vault
-            var storageConnectionStringSecret = await keyVaultClient.GetSecretAsync("https://azure-serverless-cv.vault.azure.net/secrets/QueueStorageConnectionString/253316b1740d4b01a02a307101d77ef0/latest?api-version=2021-01-01");
+            var storageConnectionStringSecret = await keyVaultClient.GetSecretAsync("https://azure-serverless-cv.vault.azure.net/secrets/QueueStorageConnectionString/253316b1740d4b01a02a307101d77ef0/latest?api-version=2016-10-01");
             var storageConnectionString = storageConnectionStringSecret.Value;
 
             // Connect to Azure Storage Account
