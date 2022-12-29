@@ -16,7 +16,7 @@ namespace SiteCounter
 
     public static class SiteCounterCosmosDbFunction
     {
-        [FunctionName("SiteCounterCosmosDbFunction")]
+        [FunctionName("SiteCounterFunction")]
         public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
@@ -48,6 +48,9 @@ namespace SiteCounter
             // Get the CosmosDB connection string from the secret
             var cosmosDBConnectionString = cosmosDBSecret.Value;
 
+            // Connect to Azure Storage Account
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageQueueConnectionString);
+
             // Connect to CosmosDB
             CosmosClient cosmosClient = new CosmosClient(cosmosDBConnectionString);
 
@@ -60,9 +63,15 @@ namespace SiteCounter
             siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
 
             // Add site counter object to CosmosDB
-            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));         
+            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));
+
+            // Get reference to queue
+            var queueClient = storageAccount.CreateCloudQueueClient();
+            var queue = queueClient.GetQueueReference("site-counter");
+
+            // Update the queue with the new site counter value
+            CloudQueueMessage queueMessage = new CloudQueueMessage(siteCounter.Counter.ToString());
+            await queue.UpdateMessageAsync(siteCounterMessage, System.TimeSpan.FromMinutes(1), MessageUpdateFields.Content | MessageUpdateFields.Visibility);
         }
     }
 }
-
-
