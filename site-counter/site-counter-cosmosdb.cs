@@ -5,7 +5,6 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Queue;
-using System;
 
 namespace SiteCounter
 {
@@ -59,7 +58,7 @@ namespace SiteCounter
             // Create site counter object
             SiteCounter siteCounter = new SiteCounter();
             siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
-            siteCounter.Id = System.Guid.NewGuid().ToString();
+            siteCounter.Id = "1";
 
             // Add site counter object to CosmosDB
             await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
