@@ -45,7 +45,7 @@ namespace SiteCounter
 
             // Get current site counter from blob
             var siteCounter = 0;
-            var siteCounterBlob = container.GetBlockBlobReference("site-counter-value.txt");
+            var siteCounterBlob = container.GetBlockBlobReference("site-counter-value.txt1");
             if (await siteCounterBlob.ExistsAsync())
             {
                 // Increment site counter
