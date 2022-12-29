@@ -4,7 +4,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.Storage.Blob;
 
 namespace SiteCounter
 {
@@ -16,8 +16,8 @@ namespace SiteCounter
 
     public static class SiteCounterCosmosDbFunction
     {
-        [FunctionName("SiteCounterFunction")]
-        public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
+        [FunctionName("SiteCounterCosmosDbFunction")]
+        public static async Task Run([BlobTrigger("site-counter/site-counter-value", Connection = "BlobStorageConnectionString")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
@@ -30,26 +30,23 @@ namespace SiteCounter
             // URI of the Key Vault
             var baseUri = "https://azure-serverless-cv.vault.azure.net";
 
-            // Name of the storage queue connection string secret
-            var storageQueueSecretName = "QueueStorageConnectionString";
+            // Name of the storage blob connection string secret
+            var storageBlobSecretName = "BlobStorageConnectionString";
 
             // Name of the CosmosDB connection string secret
             var cosmosDBSecretName = "DatabaseConnectionString";
 
-            // Retrieve the storage queue connection string secret from the Key Vault
-            var storageQueueSecret = await keyVaultClient.GetSecretAsync(baseUri, storageQueueSecretName);
+            // Retrieve the storage blob connection string secret from the Key Vault
+            var storageBlobSecret = await keyVaultClient.GetSecretAsync(baseUri, storageBlobSecretName);
 
             // Retrieve the CosmosDB connection string secret from the Key Vault
             var cosmosDBSecret = await keyVaultClient.GetSecretAsync(baseUri, cosmosDBSecretName);
 
-            // Get the storage queue connection string from the secret
-            var storageQueueConnectionString = storageQueueSecret.Value;
+            // Get the storage blob connection string from the secret
+            var storageBlobConnectionString = storageBlobSecret.Value;
 
             // Get the CosmosDB connection string from the secret
             var cosmosDBConnectionString = cosmosDBSecret.Value;
-
-            // Connect to Azure Storage Account
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageQueueConnectionString);
 
             // Connect to CosmosDB
             CosmosClient cosmosClient = new CosmosClient(cosmosDBConnectionString);
@@ -58,20 +55,17 @@ namespace SiteCounter
             var database = cosmosClient.GetDatabase("AzureServerlessCV");
             var container = database.GetContainer("SiteCounter");
 
+            // Read site counter value from blob
+            string siteCounterValue = await siteCounterBlob.DownloadTextAsync();
+
             // Create site counter object
             SiteCounter siteCounter = new SiteCounter();
-            siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
+            siteCounter.Counter = int.Parse(siteCounterValue);
 
             // Add site counter object to CosmosDB
-            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));
-
-            // Get reference to queue
-            var queueClient = storageAccount.CreateCloudQueueClient();
-            var queue = queueClient.GetQueueReference("site-counter");
-
-            // Update the queue with the new site counter value
-            CloudQueueMessage queueMessage = new CloudQueueMessage(siteCounter.Counter.ToString());
-            await queue.UpdateMessageAsync(siteCounterMessage, System.TimeSpan.FromMinutes(1), MessageUpdateFields.Content | MessageUpdateFields.Visibility);
+            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));      
         }
     }
 }
+
+

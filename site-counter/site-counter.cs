@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.Storage.Blob;
 
 namespace SiteCounter
 {
@@ -25,7 +25,7 @@ namespace SiteCounter
             var BaseUri = "https://azure-serverless-cv.vault.azure.net";
 
             // Name of the secret
-            var secretname = "QueueStorageConnectionString";
+            var secretname = "BlobStorageConnectionString";
 
             // Retrieve the secret from the Key Vault
             var secret = await keyVaultClient.GetSecretAsync(BaseUri, secretname);
@@ -36,25 +36,24 @@ namespace SiteCounter
             // Connect to Azure Storage Account
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
 
-            // Get reference to queue
-            var queueClient = storageAccount.CreateCloudQueueClient();
-            var queue = queueClient.GetQueueReference("site-counter");
+            // Get reference to container
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("site-counter");
 
-            // Create queue if it doesn't already exist
-        await queue.CreateIfNotExistsAsync();
+            // Create container if it doesn't already exist
+            await container.CreateIfNotExistsAsync();
 
-        // Get current site counter from queue
-        var siteCounter = 0;
-        var queueMessage = await queue.GetMessageAsync();
-        if (queueMessage != null)
-        {
-            // Increment site counter
-            siteCounter = int.Parse(queueMessage.AsString) + 1;
+            // Get current site counter from blob
+            var siteCounter = 0;
+            var siteCounterBlob = container.GetBlockBlobReference("site-counter-value");
+            if (await siteCounterBlob.ExistsAsync())
+            {
+                // Increment site counter
+                siteCounter = int.Parse(await siteCounterBlob.DownloadTextAsync()) + 1;
+            }
+
+            // Add new site counter value to blob
+            await siteCounterBlob.UploadTextAsync(siteCounter.ToString());
         }
-
-        // Add new site counter value to queue
-        queueMessage = new CloudQueueMessage(siteCounter.ToString());
-        await queue.AddMessageAsync(queueMessage);
-    }
     }
 }
