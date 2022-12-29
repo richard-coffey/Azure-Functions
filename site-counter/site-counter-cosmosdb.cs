@@ -1,5 +1,4 @@
 using Microsoft.Azure.WebJobs;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
@@ -14,8 +13,8 @@ namespace SiteCounter
     {
         public int Counter { get; set; }
         public string Id { get; set; }
-
     }
+
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
@@ -30,7 +29,7 @@ namespace SiteCounter
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
             // URI of the Key Vault
-            var BaseUri = "https://azure-serverless-cv.vault.azure.net";
+            var baseUri = "https://azure-serverless-cv.vault.azure.net";
 
             // Name of the storage queue connection string secret
             var storageQueueSecretName = "QueueStorageConnectionString";
@@ -39,10 +38,10 @@ namespace SiteCounter
             var cosmosDBSecretName = "DatabaseConnectionString";
 
             // Retrieve the storage queue connection string secret from the Key Vault
-            var storageQueueSecret = await keyVaultClient.GetSecretAsync(BaseUri, storageQueueSecretName);
+            var storageQueueSecret = await keyVaultClient.GetSecretAsync(baseUri, storageQueueSecretName);
 
             // Retrieve the CosmosDB connection string secret from the Key Vault
-            var cosmosDBSecret = await keyVaultClient.GetSecretAsync(BaseUri, cosmosDBSecretName);
+            var cosmosDBSecret = await keyVaultClient.GetSecretAsync(baseUri, cosmosDBSecretName);
 
             // Get the storage queue connection string from the secret
             var storageQueueConnectionString = storageQueueSecret.Value;
@@ -57,12 +56,10 @@ namespace SiteCounter
             var database = cosmosClient.GetDatabase("AzureServerlessCV");
             var container = database.GetContainer("SiteCounter");
 
-            // Convert site counter message to site counter object
-            SiteCounter siteCounter = new SiteCounter
-            {
-                Counter = int.Parse(siteCounterMessage.AsString),
-                Id = System.Guid.NewGuid().ToString()
-            };
+            // Create site counter object
+            SiteCounter siteCounter = new SiteCounter();
+            siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
+            siteCounter.Id = System.Guid.NewGuid().ToString();
 
             // Add site counter object to CosmosDB
             await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
