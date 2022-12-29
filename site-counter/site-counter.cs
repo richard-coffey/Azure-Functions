@@ -50,9 +50,6 @@ namespace SiteCounter
         {
             // Increment site counter
             siteCounter = int.Parse(queueMessage.AsString) + 1;
-
-            // Delete existing queue message
-            await queue.DeleteMessageAsync(queueMessage);
         }
 
         // Add new site counter value to queue

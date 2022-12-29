@@ -60,17 +60,7 @@ namespace SiteCounter
             siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
 
             // Add site counter object to CosmosDB
-            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));
-
-            // Connect to Azure Storage Account
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageQueueConnectionString);
-
-            // Get reference to queue
-            var queueClient = storageAccount.CreateCloudQueueClient();
-            var queue = queueClient.GetQueueReference("site-counter");
-
-            // Re-add the message to the queue
-            await queue.AddMessageAsync(siteCounterMessage);            
+            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.id));         
         }
     }
 }
