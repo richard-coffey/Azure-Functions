@@ -17,7 +17,7 @@ namespace SiteCounter
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
-        public static async Task Run([BlobTrigger("site-counter/site-counter-value.txt", Connection = "@Microsoft.KeyVault(SecretUri=https://azure-serverless-cv.vault.azure.net/secrets/BlobContainerConnectionString/d2abfdbd4dca475c9031d4e95bfeb430)")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("site-counter/site-counter-value.txt", Connection = "BlobContainerConnectionString")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
