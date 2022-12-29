@@ -1,5 +1,4 @@
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
@@ -11,12 +10,13 @@ namespace SiteCounter
 {
     public class SiteCounter
     {
+        public string Id { get; set; }
         public int Counter { get; set; }
     }
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
-        public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] string siteCounterMessage, ILogger log)
+        public static async Task Run([QueueTrigger("site-counter", Connection = "QueueStorageConnectionString")] CloudQueueMessage siteCounterMessage, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
@@ -57,11 +57,12 @@ namespace SiteCounter
             // Convert site counter message to site counter object
             SiteCounter siteCounter = new SiteCounter
             {
-                Counter = int.Parse(siteCounterMessage)
+                Counter = int.Parse(siteCounterMessage.AsString),
+                Id = System.Guid.NewGuid().ToString()
             };
 
-            // Add site counter object to CosmosDB
-            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
+// Add site counter object to CosmosDB
+await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
         }
     }
 }
