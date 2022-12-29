@@ -55,14 +55,19 @@ namespace SiteCounter
             var container = database.GetContainer("SiteCounter");
 
             // Convert site counter message to site counter object
-            SiteCounter siteCounter = new SiteCounter
-            {
-                Counter = int.Parse(siteCounterMessage.AsString),
-                Id = System.Guid.NewGuid().ToString()
-            };
+SiteCounter siteCounter = new SiteCounter
+{
+    Counter = int.Parse(siteCounterMessage.AsString)
+};
 
-// Add site counter object to CosmosDB
-await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
+// Retrieve the item from the container
+SiteCounter existingSiteCounter = await container.ReadItemAsync<SiteCounter>(siteCounter.Counter.ToString(), new PartitionKey(siteCounter.Counter.ToString()));
+
+// Update the properties of the item
+existingSiteCounter.Counter = siteCounter.Counter;
+
+// Save the updated item back to the container
+await container.ReplaceItemAsync<SiteCounter>(existingSiteCounter, existingSiteCounter.Counter.ToString(), new PartitionKey(existingSiteCounter.Counter.ToString()));
         }
     }
 }
