@@ -31,7 +31,7 @@ namespace SiteCounter
             var baseUri = "https://azure-serverless-cv.vault.azure.net";
 
             // Name of the storage blob connection string secret
-            var storageBlobSecretName = "BlobStorageConnectionString";
+            var storageBlobSecretName = "BlobContainerConnectionString";
 
             // Name of the CosmosDB connection string secret
             var cosmosDBSecretName = "DatabaseConnectionString";

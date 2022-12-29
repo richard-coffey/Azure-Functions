@@ -25,7 +25,7 @@ namespace SiteCounter
             var BaseUri = "https://azure-serverless-cv.vault.azure.net";
 
             // Name of the secret
-            var secretname = "BlobStorageConnectionString";
+            var secretname = "BlobContainerConnectionString";
 
             // Retrieve the secret from the Key Vault
             var secret = await keyVaultClient.GetSecretAsync(BaseUri, secretname);
