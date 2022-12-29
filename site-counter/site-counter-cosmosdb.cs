@@ -60,6 +60,7 @@ namespace SiteCounter
             SiteCounter siteCounter = new SiteCounter();
             siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
             siteCounter.Id = System.Guid.NewGuid().ToString();
+            Console.WriteLine("Id: " + siteCounter.Id);
 
             // Add site counter object to CosmosDB
             await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
