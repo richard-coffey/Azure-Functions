@@ -29,20 +29,20 @@ namespace SiteCounter
             // URI of the Key Vault
             var BaseUri = "https://azure-serverless-cv.vault.azure.net";
 
-            // Name of the storage queue connection string secret
-            var storageQueueSecretName = "QueueStorageConnectionString";
+            // Name of the queue storage connection string secret
+            var queueStorageSecretName = "QueueStorageConnectionString";
 
             // Name of the CosmosDB connection string secret
             var cosmosDBSecretName = "DatabaseConnectionString";
 
-            // Retrieve the storage queue connection string secret from the Key Vault
-            var storageQueueSecret = await keyVaultClient.GetSecretAsync(BaseUri, storageQueueSecretName);
+            // Retrieve the queue storage connection string secret from the Key Vault
+            var queueStorageSecret = await keyVaultClient.GetSecretAsync(BaseUri, queueStorageSecretName);
 
             // Retrieve the CosmosDB connection string secret from the Key Vault
             var cosmosDBSecret = await keyVaultClient.GetSecretAsync(BaseUri, cosmosDBSecretName);
 
-            // Get the storage queue connection string from the secret
-            var storageQueueConnectionString = storageQueueSecret.Value;
+            // Get the queue storage connection string from the secret
+            var queueStorageConnectionString = queueStorageSecret.Value;
 
             // Get the CosmosDB connection string from the secret
             var cosmosDBConnectionString = cosmosDBSecret.Value;
@@ -65,3 +65,5 @@ namespace SiteCounter
         }
     }
 }
+
+
