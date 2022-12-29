@@ -1,4 +1,5 @@
 using Microsoft.Azure.WebJobs;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.KeyVault;
@@ -10,7 +11,6 @@ namespace SiteCounter
 {
     public class SiteCounter
     {
-        public string Id { get; set; }
         public int Counter { get; set; }
     }
     public static class SiteCounterCosmosDbFunction
@@ -55,19 +55,14 @@ namespace SiteCounter
             var container = database.GetContainer("SiteCounter");
 
             // Convert site counter message to site counter object
-SiteCounter siteCounter = new SiteCounter
-{
-    Counter = int.Parse(siteCounterMessage.AsString)
-};
+            SiteCounter siteCounter = new SiteCounter
+            {
+                
+                Counter = int.Parse(siteCounterMessage.AsString)
+            };
 
-// Retrieve the item from the container
-SiteCounter existingSiteCounter = await container.ReadItemAsync<SiteCounter>(siteCounter.Counter.ToString(), new PartitionKey(siteCounter.Counter.ToString()));
-
-// Update the properties of the item
-existingSiteCounter.Counter = siteCounter.Counter;
-
-// Save the updated item back to the container
-await container.ReplaceItemAsync<SiteCounter>(existingSiteCounter, existingSiteCounter.Counter.ToString(), new PartitionKey(existingSiteCounter.Counter.ToString()));
+            // Add site counter object to CosmosDB
+            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
         }
     }
 }
