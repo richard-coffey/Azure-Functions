@@ -63,6 +63,8 @@ namespace SiteCounter
 
             // Add site counter object to CosmosDB
             await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
+
+            Console.WriteLine("Id: " + siteCounter.Id);
         }
     }
 }
