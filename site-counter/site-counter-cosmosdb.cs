@@ -6,12 +6,15 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Queue;
+using System;
 
 namespace SiteCounter
 {
     public class SiteCounter
     {
         public int Counter { get; set; }
+        public string Id { get; set; }
+
     }
     public static class SiteCounterCosmosDbFunction
     {
@@ -57,12 +60,12 @@ namespace SiteCounter
             // Convert site counter message to site counter object
             SiteCounter siteCounter = new SiteCounter
             {
-                
-                Counter = int.Parse(siteCounterMessage.AsString)
+                Counter = int.Parse(siteCounterMessage.AsString),
+                Id = System.Guid.NewGuid().ToString()
             };
 
             // Add site counter object to CosmosDB
-            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Counter.ToString()));
+            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
         }
     }
 }
