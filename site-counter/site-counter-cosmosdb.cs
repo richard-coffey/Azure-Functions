@@ -12,7 +12,7 @@ namespace SiteCounter
     public class SiteCounter
     {
         public int Counter { get; set; }
-        public string Id { get; set; }
+        public string Id { get; set; } = "1";
     }
 
     public static class SiteCounterCosmosDbFunction
@@ -59,10 +59,9 @@ namespace SiteCounter
             // Create site counter object
             SiteCounter siteCounter = new SiteCounter();
             siteCounter.Counter = int.Parse(siteCounterMessage.AsString);
-            siteCounter.Id = System.Guid.NewGuid().ToString();
 
             // Add site counter object to CosmosDB
-            await container.CreateItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
+            await container.UpsertItemAsync<SiteCounter>(siteCounter, new PartitionKey(siteCounter.Id));
         }
     }
 }
