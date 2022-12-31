@@ -8,6 +8,9 @@ namespace SiteCounter
 {
     public static class CosmosDBCounterTriggerFunction
     {
+        // Declare a global variable to store the counter value
+        public static int CounterValue;
+
         [FunctionName("CosmosDBCounterTriggerFunction")]
         public static void Run([CosmosDBTrigger(
             databaseName: "AzureServerlessCV",
@@ -25,13 +28,11 @@ namespace SiteCounter
                 // Check if the document is the counter with an id of "1"
                 if (counterObject.id == "1")
                 {
-                    // Store the counter value in a variable
-                    var counterValue = counterObject.Counter;
+                    // Store the counter value in the global variable
+                    CounterValue = counterObject.Counter;
 
                     // Log the counter value
-                    log.LogInformation($"Counter value: {counterValue}");
-
-                    // You can use the counterValue variable to expose the value through an API
+                    log.LogInformation($"Counter value: {CounterValue}");
                 }
             }
         }
