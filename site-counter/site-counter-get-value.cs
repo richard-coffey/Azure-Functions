@@ -14,6 +14,9 @@ namespace SiteCounter
             // Read the value of the counter from the global variable
             int counterValue = CosmosDBCounterTriggerFunction.CounterValue;
 
+            // Log the counter value
+            log.LogInformation($"Counter value: {counterValue}");
+
             // Return the counter value in the response body
             return new OkObjectResult(counterValue);
         }
