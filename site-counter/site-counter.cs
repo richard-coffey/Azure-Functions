@@ -11,27 +11,11 @@ namespace SiteCounter
     public static class SiteCounterFunction
     {
         [FunctionName("SiteCounterFunction")]
-        public static async Task Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] Microsoft.AspNetCore.Http.HttpRequest req, ILogger log)
+        public static async Task Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] Microsoft.AspNetCore.Http.HttpRequest req, ILogger log, ExecutionContext context)
         {
             log.LogInformation("SiteCounterFunction function processed a request.");
-
-            // Get the Azure AD token provider
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-            // Get a client for the Key Vault
-            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-            // URI of the Key Vault
-            var BaseUri = "https://azure-serverless-cv.vault.azure.net";
-
-            // Name of the secret
-            var secretname = "BlobContainerConnectionString";
-
-            // Retrieve the secret from the Key Vault
-            var secret = await keyVaultClient.GetSecretAsync(BaseUri, secretname);
-
-            // Get the storage connection string from the secret
-            var storageConnectionString = secret.Value;
+            // Get the storage connection string from the function app settings
+            var storageConnectionString = System.Environment.GetEnvironmentVariable("BlobContainerConnectionString", System.EnvironmentVariableTarget.Process);
 
             // Connect to Azure Storage Account
             var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
