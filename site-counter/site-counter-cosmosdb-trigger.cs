@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -6,6 +7,12 @@ using Microsoft.Azure.Documents;
 
 namespace SiteCounter
 {
+    public class CounterDocument
+    {
+        public int Counter { get; set; }
+        public string id { get; set; }
+    }
+
     public static class CosmosDBCounterTriggerFunction
     {
         [FunctionName("CosmosDBCounterTriggerFunction")]
@@ -20,13 +27,13 @@ namespace SiteCounter
             if (documents != null && documents.Count > 0)
             {
                 var document = documents[0];
-                dynamic counterObject = JsonConvert.DeserializeObject<dynamic>(document.ToString());
+                var counterObject = JsonConvert.DeserializeObject<CounterDocument>(document.ToString());
 
                 // Check if the document is the counter with an id of "1"
                 if (counterObject.id == "1")
                 {
                     // Store the counter value in a variable
-                    var counterValue = counterObject.counter;
+                    var counterValue = counterObject.Counter;
 
                     // Log the counter value
                     log.LogInformation($"Counter value: {counterValue}");
