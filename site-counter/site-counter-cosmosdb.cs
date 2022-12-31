@@ -1,10 +1,9 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Extensions.Configuration;
 
 namespace SiteCounter
 {
@@ -17,36 +16,22 @@ namespace SiteCounter
     public static class SiteCounterCosmosDbFunction
     {
         [FunctionName("SiteCounterCosmosDbFunction")]
-        public static async Task Run([BlobTrigger("site-counter/{name}", Connection = "BlobContainerConnectionString")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("site-counter/{name}", Connection = "BlobContainerConnectionString")] CloudBlockBlob siteCounterBlob, string name, ILogger log, ExecutionContext context)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
-            // Get the Azure AD token provider
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            // Build a configuration object from the app settings
+            var config = new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
 
-            // Get a client for the Key Vault
-            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            // Get the storage blob connection string from the app settings
+            var storageBlobConnectionString = config.GetConnectionString("BlobContainerConnectionString");
 
-            // URI of the Key Vault
-            var baseUri = "https://azure-serverless-cv.vault.azure.net";
-
-            // Name of the storage blob connection string secret
-            var storageBlobSecretName = "BlobContainerConnectionString";
-
-            // Name of the CosmosDB connection string secret
-            var cosmosDBSecretName = "DatabaseConnectionString";
-
-            // Retrieve the storage blob connection string secret from the Key Vault
-            var storageBlobSecret = await keyVaultClient.GetSecretAsync(baseUri, storageBlobSecretName);
-
-            // Retrieve the CosmosDB connection string secret from the Key Vault
-            var cosmosDBSecret = await keyVaultClient.GetSecretAsync(baseUri, cosmosDBSecretName);
-
-            // Get the storage blob connection string from the secret
-            var storageBlobConnectionString = storageBlobSecret.Value;
-
-            // Get the CosmosDB connection string from the secret
-            var cosmosDBConnectionString = cosmosDBSecret.Value;
+            // Get the CosmosDB connection string from the app settings
+            var cosmosDBConnectionString = config.GetConnectionString("DatabaseConnectionString");
 
             // Connect to CosmosDB
             CosmosClient cosmosClient = new CosmosClient(cosmosDBConnectionString);
