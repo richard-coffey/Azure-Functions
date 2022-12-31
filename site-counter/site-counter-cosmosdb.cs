@@ -28,7 +28,7 @@ namespace SiteCounter
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
             // URI of the Key Vault
-            var baseUri = "KeyVaultUri";
+            var baseUri = "https://azure-serverless-cv.vault.azure.net";
 
             // Name of the storage blob connection string secret
             var storageBlobSecretName = "BlobContainerConnectionString";
