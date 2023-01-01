@@ -1,35 +1,40 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace SiteCounter
 {
     public static class GetCounterValueFunction
     {
-        private static int lastGoodCounterValue = 0;
-
         [FunctionName("GetCounterValueFunction")]
-        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequest req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequestMessage req, ILogger log)
         {
-            // Read the value of the counter from the global variable
-            int counterValue = CosmosDBCounterTriggerFunction.CounterValue;
+            // Read the Cosmos DB connection string and database name from app settings
+            string connectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            string databaseName = Environment.GetEnvironmentVariable("DatabaseName");
 
-            // If the counter value is 0, return the last good value instead
-            if (counterValue == 0)
-            {
-                return new OkObjectResult(lastGoodCounterValue);
-            }
+            // Create an HTTP client
+            HttpClient client = new HttpClient();
 
-            // Update the last good value
-            lastGoodCounterValue = counterValue;
+            // Set the request URI and headers
+            string requestUri = $"{connectionString}/dbs/{databaseName}/colls/SiteCounter/docs/1";
+            client.DefaultRequestHeaders.Add("Authorization", Environment.GetEnvironmentVariable("DatabaseKey"));
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-            // Log the counter value
-            log.LogInformation($"Counter value: {counterValue}");
+            // Send the request and get the response
+            HttpResponseMessage response = await client.GetAsync(requestUri);
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            // Parse the response content and get the counter value
+            JObject responseObject = JObject.Parse(responseContent);
+            int counterValue = (int)responseObject["Counter"];
 
             // Return the counter value in the response body
-            return new OkObjectResult(counterValue);
+            return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValue);
         }
     }
 }
