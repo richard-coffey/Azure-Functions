@@ -34,7 +34,7 @@ namespace SiteCounter
             int counterValue = siteCounter["Counter"].Value<int>();
 
             // Log the counter value
-            log.LogInformation($"Counter value: {siteCounter}");
+            log.LogInformation($"Counter value: {counterValue}");
 
             // Return the counter value in the response body
             return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValue);
