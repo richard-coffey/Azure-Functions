@@ -26,23 +26,18 @@ namespace SiteCounter
             var database = cosmosClient.GetDatabase("AzureServerlessCV");
             var container = database.GetContainer("SiteCounter");
 
-            try
-            {
-                // Read the site counter document
-                var siteCounterDoc = await container.ReadItemAsync<JObject>("1", new PartitionKey("1"));
-                var siteCounter = siteCounterDoc.Resource;
+            // Read the site counter document
+            var siteCounterDoc = await container.ReadItemAsync<JObject>("1", new PartitionKey("1"));
+            var siteCounter = siteCounterDoc.Resource;
 
-                // Get the counter value
-                int counterValue = siteCounter["Counter"].Value<int>();
+            // Get the counter value
+            int counterValue = siteCounter["Counter"].Value<int>();
 
-                // Return the counter value in the response body
-                return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValue);
-            }
-            catch (CosmosException ex)
-            {
-                log.LogError($"Error reading site counter from Cosmos DB: {ex.ToString()}");
-                return req.CreateErrorResponse(System.Net.HttpStatusCode.InternalServerError, ex);
-            }
+            // Log the counter value
+            log.LogInformation($"Counter value: {siteCounter}");
+
+            // Return the counter value in the response body
+            return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValue);
         }
     }
 }
