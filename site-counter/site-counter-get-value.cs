@@ -8,16 +8,16 @@ namespace SiteCounter
 {
     public static class GetCounterValueFunction
     {
-        private static int lastGoodCounterValue = 0;
+        private static int? lastGoodCounterValue = null;
 
         [FunctionName("GetCounterValueFunction")]
         public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequest req, ILogger log)
         {
             // Read the value of the counter from the global variable
-            int counterValue = CosmosDBCounterTriggerFunction.CounterValue;
+            int? counterValue = CosmosDBCounterTriggerFunction.CounterValue;
 
-            // If the counter value is 0, return the last good value instead
-            if (counterValue == 0)
+            // If the counter value is null, return the last good value instead
+            if (counterValue == null)
             {
                 return new OkObjectResult(lastGoodCounterValue);
             }
