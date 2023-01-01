@@ -33,11 +33,14 @@ namespace SiteCounter
             // Get the counter value
             int counterValue = siteCounter["Counter"].Value<int>();
 
-            // Log the counter value
-            log.LogInformation($"Counter value: {counterValue}");
+            // Convert the counter value to a string
+            string counterValueString = counterValue.ToString();
 
-            // Return the counter value in the response body
-            return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValue);
+            // Log the counter value
+            log.LogInformation($"Counter value: {counterValueString}");
+
+            // Return the counter value as a string in the response body
+            return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValueString);
         }
     }
 }
