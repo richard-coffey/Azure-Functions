@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,16 @@ namespace SiteCounter
             string requestUri = "https://cosmosdb-azure-serverless-cv.documents.azure.com:443/dbs/AzureServerlessCV/colls/SiteCounter/docs/1";
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-            log.LogInformation($"Sending request to URI: {requestUri}");
+            // Get an access token for the Cosmos DB resource using managed identity
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync("https://cosmosdb.azure.com/");
+
+            // Add the access token to the "authorization" header
+            client.DefaultRequestHeaders.Add("authorization", $"Bearer {accessToken}");
 
             // Send the request and get the response
             HttpResponseMessage response = await client.GetAsync(requestUri);
             string responseContent = await response.Content.ReadAsStringAsync();
-
-            log.LogInformation($"Received response from Cosmos DB: {responseContent}");
 
             // Parse the response content and get the counter value
             JObject responseObject = JObject.Parse(responseContent);
