@@ -22,7 +22,6 @@ namespace SiteCounter
 
             // Set the request URI and headers
             string requestUri = $"{connectionString}/dbs/{databaseName}/colls/SiteCounter/docs/1";
-            client.DefaultRequestHeaders.Add("Authorization", Environment.GetEnvironmentVariable("DatabaseKey"));
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             // Send the request and get the response
