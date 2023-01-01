@@ -12,6 +12,8 @@ namespace SiteCounter
         [FunctionName("GetCounterValueFunction")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequestMessage req, ILogger log)
         {
+            log.LogInformation("GetCounterValueFunction function started");
+
             // Create an HTTP client
             HttpClient client = new HttpClient();
 
@@ -19,9 +21,13 @@ namespace SiteCounter
             string requestUri = "https://cosmosdb-azure-serverless-cv.documents.azure.com:443/dbs/AzureServerlessCV/colls/SiteCounter/docs/1";
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
+            log.LogInformation($"Sending request to URI: {requestUri}");
+
             // Send the request and get the response
             HttpResponseMessage response = await client.GetAsync(requestUri);
             string responseContent = await response.Content.ReadAsStringAsync();
+
+            log.LogInformation($"Received response from Cosmos DB: {responseContent}");
 
             // Parse the response content and get the counter value
             JObject responseObject = JObject.Parse(responseContent);
