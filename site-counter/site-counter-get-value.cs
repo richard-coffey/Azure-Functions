@@ -15,13 +15,12 @@ namespace SiteCounter
         {
             // Read the Cosmos DB connection string and database name from app settings
             string connectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
-            string databaseName = Environment.GetEnvironmentVariable("DatabaseName");
 
             // Create an HTTP client
             HttpClient client = new HttpClient();
 
             // Set the request URI and headers
-            string requestUri = $"{connectionString}/dbs/{databaseName}/colls/SiteCounter/docs/1";
+            string requestUri = "https://cosmosdb-azure-serverless-cv.documents.azure.com:443/dbs/AzureServerlessCV/colls/SiteCounter/docs/1";
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             // Send the request and get the response
