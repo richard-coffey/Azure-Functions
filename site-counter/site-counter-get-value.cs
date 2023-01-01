@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,7 @@ namespace SiteCounter
     public static class GetCounterValueFunction
     {
         [FunctionName("GetCounterValueFunction")]
-        public static async Task<HttpResponseMessage> Run(
+        public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequestMessage req,
             ILogger log)
         {
@@ -33,14 +34,11 @@ namespace SiteCounter
             // Get the counter value
             int counterValue = siteCounter["Counter"].Value<int>();
 
-            // Convert the counter value to a string
-            string counterValueString = counterValue.ToString();
-
             // Log the counter value
-            log.LogInformation($"Counter value: {counterValueString}");
+            log.LogInformation($"Counter value: {counterValue}");
 
-            // Return the counter value as a string in the response body
-            return req.CreateResponse(System.Net.HttpStatusCode.OK, counterValueString);
+            // Return the counter value as a payload in the response body
+            return new OkObjectResult(counterValue);
         }
     }
 }
