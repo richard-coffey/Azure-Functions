@@ -20,6 +20,8 @@ namespace FormSubmission
             string name = req.Query["name"];
             string email = req.Query["email"];
 
+            log.LogInformation($"Received request with name: {name}, email: {email}");
+
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
             {
                 return new BadRequestObjectResult("Please provide both a name and an email.");
