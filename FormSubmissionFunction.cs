@@ -20,8 +20,6 @@ namespace FormSubmission
             string name = req.Form["name"];
             string email = req.Form["email"];
 
-            log.LogInformation($"Received request with name: {name}, email: {email}");
-
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
             {
                 return new BadRequestObjectResult("Please provide both a name and an email.");
@@ -42,8 +40,6 @@ namespace FormSubmission
             // Create a message with the name and email values
             string messageContent = $"name: {name}, email: {email}";
             CloudQueueMessage message = new CloudQueueMessage(messageContent);
-
-            log.LogInformation($"Adding message to queue: {messageContent}");
 
             // Add the message to the queue
             await queue.AddMessageAsync(message);
