@@ -1,9 +1,9 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.WebJobs.Extensions.Storage;
 
 namespace SiteCounter
 {
@@ -16,7 +16,7 @@ namespace SiteCounter
     {
         [FunctionName("BlobTrigger")]
         [StorageAccount("BlobContainerConnectionString")]
-        public static async Task Run([BlobTrigger("azure-functions/{name}")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("site-counter/{name}")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
