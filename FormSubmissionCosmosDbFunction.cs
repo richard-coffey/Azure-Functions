@@ -7,8 +7,8 @@ namespace FormSubmission
 {
     public static class FormSubmissionCosmosDbFunction
     {
-        [FunctionName("FormSubmissionCosmosDbFunction")]
-        public static void Run([QueueTrigger("form-submission", Connection = "BlobContainerConnectionString")]string myQueueItem, ILogger log)
+        [FunctionName("QueueTriggerFunction")]
+        public static void Run([QueueTrigger("queue-name", Connection = "BlobContainerConnectionString")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
 
@@ -26,8 +26,11 @@ namespace FormSubmission
             // Get the "FormSubmission" container
             Container container = client.GetContainer("AzureServerlessCV", "FormSubmission");
 
+            // Generate a new GUID for the "id" field of the document
+            string documentId = Guid.NewGuid().ToString();
+
             // Insert a new document into the container
-            container.CreateItemAsync(new { name = name, email = email }).Wait();
+            container.CreateItemAsync(new { id = documentId, name = name, email = email }).Wait();
         }
     }
 }
