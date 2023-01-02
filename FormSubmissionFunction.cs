@@ -41,6 +41,8 @@ namespace FormSubmission
             string messageContent = $"name: {name}, email: {email}";
             CloudQueueMessage message = new CloudQueueMessage(messageContent);
 
+            log.LogInformation($"Adding message to queue: {messageContent}");
+
             // Add the message to the queue
             await queue.AddMessageAsync(message);
 
