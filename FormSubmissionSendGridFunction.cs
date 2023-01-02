@@ -1,13 +1,12 @@
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FormSubmission
 {
@@ -41,10 +40,13 @@ namespace FormSubmission
                 CloudBlobContainer container = blobClient.GetContainerReference("cv-pdf");
                 CloudBlockBlob blob = container.GetBlockBlobReference("Richard Coffey - CV (December 2022).pdf");
 
-                // Download the blob as a byte array
-                long blobLength = blob.Properties.Length;
-                byte[] blobBytes = new byte[blobLength];
-                blob.DownloadToByteArray(blobBytes, 0);
+                // Download the blob as a stream
+                MemoryStream memoryStream = new MemoryStream();
+                blob.DownloadToStreamAsync(memoryStream).Wait();
+
+                // Convert the stream to a byte array
+                memoryStream.Position = 0;
+                byte[] blobBytes = memoryStream.ToArray();
 
                 // Add the attachment to the email message
                 message.AddAttachment(blob.Name, Convert.ToBase64String(blobBytes));
