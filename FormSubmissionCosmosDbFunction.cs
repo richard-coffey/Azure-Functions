@@ -14,8 +14,8 @@ namespace FormSubmission
 
             // Parse the message from the queue
             string[] messageParts = myQueueItem.Split(' ');
-            string name = messageParts[0];
-            string email = messageParts[1];
+            string name = messageParts[1];
+            string email = messageParts[2];
 
             // Get the CosmosDB connection string from the app settings
             string cosmosDbConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
