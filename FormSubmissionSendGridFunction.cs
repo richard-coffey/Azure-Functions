@@ -5,12 +5,12 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
 
-namespace MyFunctionApp
+namespace FormSubmission
 {
-    public static class CosmosDbTriggerFunction
+    public static class FormSubmissionSendGridFunction
     {
-        [FunctionName("CosmosDbTriggerFunction")]
-        public static void Run([CosmosDBTrigger(databaseName: "AzureServerlessCV", collectionName: "FormSubmission", ConnectionStringSetting = "DatabaseConnectionString")]IReadOnlyList<dynamic> documents, ILogger log)
+        [FunctionName("FormSubmissionSendGridFunction")]
+        public static void Run([CosmosDBTrigger(databaseName: "AzureServerlessCV", collectionName: "FormSubmission", ConnectionStringSetting = "DatabaseConnectionString")] IReadOnlyList<dynamic> documents, ILogger log)
         {
             if (documents != null && documents.Count > 0)
             {
@@ -28,8 +28,6 @@ namespace MyFunctionApp
                 message.SetSubject("New form submission");
                 message.AddContent(MimeType.Text, $"Hi {name},\n\nThank you for submitting the form.\n\nBest regards,\n\nExample Team");
 
-                
-
                 // Get the SendGrid API key from the app settings
                 string apiKey = Environment.GetEnvironmentVariable("SendGridApiKey");
 
@@ -37,7 +35,9 @@ namespace MyFunctionApp
                 SendGridClient client = new SendGridClient(apiKey);
 
                 // Send the email
+                log.LogInformation("Sending email to " + email);
                 client.SendEmailAsync(message).Wait();
+                log.LogInformation("Email sent successfully");
             }
         }
     }
