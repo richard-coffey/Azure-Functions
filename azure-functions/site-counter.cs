@@ -20,14 +20,14 @@ namespace SiteCounter
 
             // Get reference to container
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("site-counter");
+            var container = blobClient.GetContainerReference("azure-functions");
 
             // Create container if it doesn't already exist
             await container.CreateIfNotExistsAsync();
 
             // Get current site counter from blob
             var siteCounter = 0;
-            var siteCounterBlob = container.GetBlockBlobReference("site-counter-value.txt");
+            var siteCounterBlob = container.GetBlockBlobReference("azure-functions-value.txt");
             if (await siteCounterBlob.ExistsAsync())
             {
                 // Increment site counter
