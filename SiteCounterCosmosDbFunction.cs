@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.WebJobs.Extensions.Storage;
 
 namespace SiteCounter
 {
