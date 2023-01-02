@@ -20,7 +20,7 @@ namespace SiteCounter
 
             // Get reference to container
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("azure-functions");
+            var container = blobClient.GetContainerReference("site-counter");
 
             // Create container if it doesn't already exist
             await container.CreateIfNotExistsAsync();
