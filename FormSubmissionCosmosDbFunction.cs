@@ -8,7 +8,7 @@ namespace FormSubmission
     public static class FormSubmissionCosmosDbFunction
     {
         [FunctionName("FormSubmissionCosmosDbFunction")]
-        public static void Run([QueueTrigger("queue-name", Connection = "BlobContainerConnectionString")]string myQueueItem, ILogger log)
+        public static void Run([QueueTrigger("form-submission", Connection = "BlobContainerConnectionString")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
 
