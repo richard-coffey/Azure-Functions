@@ -3,11 +3,11 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 
-namespace MyFunctionApp
+namespace FormSubmission
 {
-    public static class QueueTriggerFunction
+    public static class FormSubmissionCosmosDbFunction
     {
-        [FunctionName("QueueTriggerFunction")]
+        [FunctionName("FormSubmissionCosmosDbFunction")]
         public static void Run([QueueTrigger("queue-name", Connection = "BlobContainerConnectionString")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
