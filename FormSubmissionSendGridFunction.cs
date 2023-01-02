@@ -42,7 +42,8 @@ namespace FormSubmission
                 CloudBlockBlob blob = container.GetBlockBlobReference("Richard Coffey - CV (December 2022).pdf");
 
                 // Download the blob as a byte array
-                byte[] blobBytes = new byte[blob.Properties.Length];
+                long blobLength = blob.Properties.Length;
+                byte[] blobBytes = new byte[blobLength];
                 blob.DownloadToByteArray(blobBytes, 0);
 
                 // Add the attachment to the email message
