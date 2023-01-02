@@ -17,8 +17,8 @@ namespace FormSubmission
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            string name = req.Query["name"];
-            string email = req.Query["email"];
+            string name = req.Form["name"];
+            string email = req.Form["email"];
 
             log.LogInformation($"Received request with name: {name}, email: {email}");
 
