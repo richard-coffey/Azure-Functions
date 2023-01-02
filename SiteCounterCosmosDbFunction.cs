@@ -13,6 +13,7 @@ namespace SiteCounter
     }
     public static class SiteCounterCosmosDbFunction
     {
+        [FunctionName("SiteCounterCosmosDbFunction")]
         [StorageAccount("BlobContainerConnectionString")]
         public static async Task Run([BlobTrigger("site-counter/{name}")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
         {
