@@ -15,7 +15,7 @@ namespace SiteCounter
     {
         [FunctionName("BlobTrigger")]
         [StorageAccount("BlobContainerConnectionString")]
-        public static async Task Run([BlobTrigger("{name}")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("site-counter/{name}")] CloudBlockBlob siteCounterBlob, string name, ILogger log)
         {
             log.LogInformation("SiteCounterCosmosDbFunction function processed a request.");
 
