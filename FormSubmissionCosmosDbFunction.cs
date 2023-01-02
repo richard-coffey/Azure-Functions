@@ -13,9 +13,9 @@ namespace FormSubmission
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
 
             // Parse the message from the queue
-            string[] messageParts = myQueueItem.Split(' ');
-            string name = messageParts[1];
-            string email = messageParts[2];
+            string[] messageParts = myQueueItem.Split(',');
+            string name = messageParts[0].Split(':')[1].Trim();
+            string email = messageParts[1].Split(':')[1].Trim();
 
             // Get the CosmosDB connection string from the app settings
             string cosmosDbConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
