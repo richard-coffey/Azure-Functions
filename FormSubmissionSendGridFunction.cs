@@ -35,7 +35,7 @@ namespace FormSubmission
                 message.AddTo(email);
                 message.SetFrom("contact@richardcoffey.com");
                 message.SetSubject("CV Request - Richard Coffey");
-                message.AddContent(MimeType.Html, $"<p>Hi {System.Net.WebUtility.HtmlEncode(name)},</p><p>Thank you for viewing my CV. You can find a copy of my CV as a PDF attached to this email. To contact me about any possible job opportunities then please reply to this email or visit my website at <a href='{linkUrl}'>{System.Net.WebUtility.HtmlEncode(linkText)}</a>.</p><p>Best regards,</p><p>Richard Coffey</p>");
+                message.AddContent(MimeType.Html, $"<p>Hi {name},</p><p>Thank you for viewing my CV. You can find a copy of my CV as a PDF attached to this email. To contact me about any possible job opportunities then please reply to this email or visit my website at <a href='{linkUrl}'>{System.Net.WebUtility.HtmlEncode(linkText)}</a>.</p><p>Best regards,</p><p>Richard Coffey</p>");
 
                 // Attach a file from blob storage to the email
                 string storageConnectionString = Environment.GetEnvironmentVariable("BlobContainerConnectionString");
