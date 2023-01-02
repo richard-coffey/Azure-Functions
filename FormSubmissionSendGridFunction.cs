@@ -26,19 +26,23 @@ namespace FormSubmission
                 string name = document.name;
                 string email = document.email;
 
+                //HTMl for Email Link
+                string linkText = "https://richardcoffey.com/";
+                string linkUrl = "https://richardcoffey.com/";
+
                 // Set up the email message
                 SendGridMessage message = new SendGridMessage();
                 message.AddTo(email);
                 message.SetFrom("contact@richardcoffey.com");
                 message.SetSubject("CV Request - Richard Coffey");
-                message.AddContent(MimeType.Text, $"Hi {name},\n\nThank you for viewing my CV. You can find a copy of my CV as a PDF attached to this email. To contact me about any possible job opportunities then please reply to this email.\n\nBest regards,\n\nRichard Coffey");
+                message.AddContent(MimeType.Html, $"<p>Hi {System.Net.WebUtility.HtmlEncode(name)},</p><p>Thank you for viewing my CV. You can find a copy of my CV as a PDF attached to this email. To contact me about any possible job opportunities then please reply to this email or visit my website at <a href='{linkUrl}'>{System.Net.WebUtility.HtmlEncode(linkText)}</a>.</p><p>Best regards,</p><p>Richard Coffey</p>");
 
                 // Attach a file from blob storage to the email
                 string storageConnectionString = Environment.GetEnvironmentVariable("BlobContainerConnectionString");
                 CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
                 CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
                 CloudBlobContainer container = blobClient.GetContainerReference("cv-pdf");
-                CloudBlockBlob blob = container.GetBlockBlobReference("Richard Coffey - CV (December 2022).pdf");
+                CloudBlockBlob blob = container.GetBlockBlobReference("Richard Coffey - CV.pdf");
 
                 // Download the blob as a stream
                 MemoryStream memoryStream = new MemoryStream();
