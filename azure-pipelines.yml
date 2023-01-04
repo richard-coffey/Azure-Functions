@@ -52,6 +52,29 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       artifact: drop
 
+- stage: Test
+  displayName: Test stage
+  dependsOn: Build
+  condition: succeeded()
+
+  jobs:
+  - job: Test
+    displayName: Test
+    pool:
+     vmImage: $(vmImageName)
+
+     steps:
+      - task: VSTest@2
+        displayName: 'Run tests'
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: |
+           **\bin\$(BuildConfiguration)\*.Tests.dll
+           !**\obj\**
+           !**\bin\$(BuildConfiguration)\netcoreapp3.1\SiteCounter.deps.json            
+           searchFolder: '$(System.DefaultWorkingDirectory)/'
+           runInParallel: true
+
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
