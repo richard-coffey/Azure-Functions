@@ -1,14 +1,11 @@
 using NUnit.Framework;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using System.Collections.Generic;
-using System.IO;
 using NSubstitute;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using System;
 using System.Threading.Tasks;
 
