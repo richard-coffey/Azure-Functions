@@ -71,7 +71,7 @@ stages:
           testAssemblyVer2: |
            **\bin\$(BuildConfiguration)\*.Tests.dll
            !**\obj\**
-           !**\bin\$(BuildConfiguration)\netcoreapp3.1\SiteCounter.deps.json            
+           !**\bin\$(BuildConfiguration)\**          
            searchFolder: '$(System.DefaultWorkingDirectory)/'
            runInParallel: true
 
