@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
+using System.Net.Http;
 
 namespace FormSubmission
 {
@@ -45,6 +46,11 @@ namespace FormSubmission
             await queue.AddMessageAsync(message);
 
             return new OkObjectResult("Thank you for your submission!");
+        }
+
+        internal static Task<IActionResult> Run(HttpRequestMessage request, object value)
+        {
+            throw new NotImplementedException();
         }
     }
 }
